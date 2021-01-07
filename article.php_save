@@ -1,0 +1,150 @@
+<?php
+require_once 'config/config.inc.php';
+require_once 'config/bdd.conf.php';
+//print_r2($_session);
+
+if ($utilisateurConnecte->isConnect == false) {
+    $_SESSION['notification']['result'] = 'danger';
+    $_SESSION['notification']['message'] = 'vous devez etre connecté';
+    header("Location: connexion.php");
+    exit();
+}
+
+if (isset($_GET['action']) AND $_GET['action'] == 'modifier') {
+    //inserer un tableau qui recupere l'id et les champs de l'id de la bdd
+    include_once 'includes/header.inc.php';
+    //$donneebdd = array($articleManager->getBdd());
+   // $texteid = $bdd->query('SELECT titre FROM articles ;)';
+   // echo $texteid;
+    ?>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1 class="mt-5">Modifier mon article</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <form id="articleForm" method="GET" action="article.php" enctype="multipart/form-data">
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="titre">Titre</label>
+                            <input type="text" id="titre" name="titre" class="form-control" value="<?php //echo $texteid ;?>" placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="texte">Le texte de mon article</label>
+                            <textarea class="form-control" id="texte" name="texte" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="image">L'image de mon article</label>
+                            <input type="file" class="form-control-file" id="image" name="image">
+                        </div>
+                    </div>    
+                    <div class="col-lg-12">
+                        <div class="form-group form-check">
+                            <input type="checkbox" checked class="form-check-input" id="publie">
+                            <label class="form-check-label" id="publie" name="publie" for="publie"> Article publié ?</label>
+                        </div>
+                    </div>    
+                    <button type="submit" id="submit" name="submit" class="btn btn-primary">Mettre à jour mon article</button>   
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php
+} else {
+    
+if (isset($_POST['submit'])) {
+    echo 'le formulaire est posté';
+
+    $article = new article();
+    $article->hydrate($_POST);
+    $article->setDate(date('Y-m-d'));
+
+    $publie = $article->getPublie() === 'on' ? 1 : 0;
+
+    $article->setPublie($publie);
+    //print_r2($article);
+    //insersion de l'article
+    $articleManager = new articleManager($bdd);
+    $articleManager->add($article);
+    //var_dump($articleManager);
+    //Traité l'image
+    if ($_FILES['image']['error'] == 0) {
+        //rename l'image uploded
+        $fileInfos = pathinfo($_FILES['image']['name']);
+        move_uploaded_file($_FILES['image']['tmp_name'], 'img/' . 'image' . $articleManager->get_getLastInsertId() . '.' . $fileInfos['extension']);
+    }
+
+    //créer une session
+    if ($articleManager->get_result() == true) {
+        $_SESSION['notification']['result'] = 'success';
+        $_SESSION['notification']['message'] = 'votre article a ete ajouté !';
+    } else {
+        $_SESSION['notification']['result'] = 'danger';
+        $_SESSION['notification']['message'] = 'Une erreur est survenue pendant la création de votre article';
+    }
+
+    header("Location: index.php");
+    exit();
+} else {
+    //echo 'aucun formulaire est posté';
+    include_once 'includes/header.inc.php';
+    ?>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1 class="mt-5">Créer un nouvel article</h1>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <form id="articleForm" method="POST" action="article.php" enctype="multipart/form-data">
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="titre">Titre</label>
+                            <input type="text" id="tite" name="titre" class="form-control" value="" placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="texte">Le texte de mon article</label>
+                            <textarea class="form-control" id="texte" name="texte" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label for="image">L'image de mon article</label>
+                            <input type="file" class="form-control-file" id="image" name="image">
+                        </div>
+                    </div>    
+                    <div class="col-lg-12">
+                        <div class="form-group form-check">
+                            <input type="checkbox" checked class="form-check-input" id="publie">
+                            <label class="form-check-label" id="publie" name="publie" for="publie"> Article publié ?</label>
+                        </div>
+                    </div>    
+                    <button type="submit" id="submit" name="submit" class="btn btn-primary">Créer mon article</button>   
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <?php
+    include_once 'includes/footer.inc.php';
+}
+}
+?>
+
