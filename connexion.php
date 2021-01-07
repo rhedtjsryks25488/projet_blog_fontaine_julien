@@ -1,4 +1,6 @@
 <?php
+// initialiser smarty 
+// $smarty = new Smarty();
 require_once 'config/config.inc.php';
 require_once 'config/bdd.conf.php';
 //print_r2($_session);

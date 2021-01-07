@@ -1,6 +1,4 @@
 <?php
-// initialiser smarty 
-// $smarty = new Smarty();
 require_once 'config/config.inc.php';
 require_once 'config/bdd.conf.php';
 //cette commande passe le time du cookie a -1 donc il est suprimmer du navigateur

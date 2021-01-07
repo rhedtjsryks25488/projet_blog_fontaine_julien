@@ -1,17 +1,18 @@
 <?php
 
+//créer une classe pour le commentaire
 class commentaireManager {
 
 //DECLARATIONS ET INSTANCIATIONS
     private $bdd; //Instance de PDO
     private $_result;
     private $_message;
-    private $_getLastInsertId;
 
+    // initialiser la base de doonnée 
     public function __construct(PDO $bdd) {
         $this->setBdd($bdd);
     }
-
+//ajouter les geter et seter 
     function getBdd() {
         return $this->bdd;
     }
